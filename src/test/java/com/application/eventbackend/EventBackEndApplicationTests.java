@@ -1,4 +1,4 @@
-package com.example.eventbackend;
+package com.application.eventbackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

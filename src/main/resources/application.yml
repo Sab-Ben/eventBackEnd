@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: eventbyte
+  datasource:
+    url: jdbc:postgresql://localhost:5432/eventbyte
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/eventbyte
+
+meilisearch:
+  host: http://localhost:7700
+  api-key: Cd9_wZ5drjqixClHEnbof-4h0bgktUzXwaY3yt8wJoM

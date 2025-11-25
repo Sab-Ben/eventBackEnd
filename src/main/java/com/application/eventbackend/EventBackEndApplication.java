@@ -1,4 +1,4 @@
-package com.example.eventbackend;
+package com.application.eventbackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
