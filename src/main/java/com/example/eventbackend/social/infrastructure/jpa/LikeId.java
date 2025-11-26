@@ -14,13 +14,13 @@ public class LikeId implements Serializable {
     private String userId;
 
     @Column(name = "event_id", nullable = false)
-    private UUID eventId;
+    private String eventId;
 
     protected LikeId() {
         // for JPA
     }
 
-    public LikeId(String userId, UUID eventId) {
+    public LikeId(String userId, String eventId) {
         this.userId = userId;
         this.eventId = eventId;
     }
@@ -29,16 +29,16 @@ public class LikeId implements Serializable {
         return userId;
     }
 
-    public UUID getEventId() {
+    public String getEventId() {
         return eventId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LikeId that)) return false;
-        return Objects.equals(userId, that.userId) &&
-                Objects.equals(eventId, that.eventId);
+        if (!(o instanceof LikeId LikeId)) return false;
+        return Objects.equals(userId, LikeId.userId) &&
+                Objects.equals(eventId, LikeId.eventId);
     }
 
     @Override

@@ -25,7 +25,7 @@ public class LikeEntity {
         // for JPA
     }
 
-    public LikeEntity(String userId, UUID eventId) {
+    public LikeEntity(String userId, String eventId) {
         this.id = new LikeId(userId, eventId);
     }
 

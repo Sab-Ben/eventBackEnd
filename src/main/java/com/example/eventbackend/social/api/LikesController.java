@@ -22,14 +22,14 @@ public class LikesController {
     }
 
     @PostMapping("/{eventId}/like")
-    public ResponseEntity<Void> likeEvent(@PathVariable UUID eventId) {
+    public ResponseEntity<Void> likeEvent(@PathVariable String eventId) {
         String userId = currentUser.requireUserId();
         socialService.likeEvent(userId, eventId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{eventId}/like")
-    public ResponseEntity<Void> unlikeEvent(@PathVariable UUID eventId) {
+    public ResponseEntity<Void> unlikeEvent(@PathVariable String eventId) {
         String userId = currentUser.requireUserId();
         socialService.unlikeEvent(userId, eventId);
         return ResponseEntity.ok().build();
