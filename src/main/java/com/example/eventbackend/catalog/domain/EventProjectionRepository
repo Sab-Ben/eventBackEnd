@@ -1,9 +1,0 @@
-package com.example.eventbackend.catalog.domain;
-
-import java.util.List;
-import java.util.Optional;
-
-public interface EventProjectionRepository {
-    Optional<EventProjection> findById(String id);
-    List<EventProjection> findByIds(List<String> ids);
-}
