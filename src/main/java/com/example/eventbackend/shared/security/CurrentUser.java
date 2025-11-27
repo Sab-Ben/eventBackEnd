@@ -8,6 +8,18 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+/**
+ * Composant utilitaire pour accéder aux informations de l'utilisateur connecté.
+ * <p>
+ * Cette classe abstrait la complexité de {@link SecurityContextHolder} et fournit
+ * une méthode simple pour récupérer l'ID de l'utilisateur courant.
+ * </p>
+ * <p>
+ * <strong>Fonctionnalité "Dev Experience" :</strong>
+ * Si le profil Spring actif est "local", cette classe peut renvoyer un utilisateur bouchon (mock)
+ * pour faciliter les tests sans avoir besoin d'un token JWT valide.
+ * </p>
+ */
 @Component
 public class CurrentUser {
 
@@ -17,6 +29,13 @@ public class CurrentUser {
         this.env = env;
     }
 
+    /**
+     * Récupère l'identifiant unique (ID) de l'utilisateur actuellement authentifié.
+     *
+     * @return L'ID de l'utilisateur (généralement le champ 'sub' du token JWT).
+     * @throws IllegalStateException Si l'utilisateur n'est pas authentifié et que l'application
+     * n'est pas en mode "local".
+     */
     public String requireUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

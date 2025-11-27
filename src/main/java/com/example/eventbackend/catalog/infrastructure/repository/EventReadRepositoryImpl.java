@@ -10,6 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Implémentation du repository de lecture utilisant Redis comme source de données.
+ * <p>
+ * Cette classe agit comme un adaptateur d'infrastructure. Elle interroge le cache Redis
+ * (via {@link EventRedisSpringRepository}) pour fournir des données ultra-rapides
+ * à l'API, évitant ainsi de charger la base de données SQL principale pour les lectures simples.
+ * </p>
+ */
 @Repository
 public class EventReadRepositoryImpl implements EventReadRepository {
 
@@ -19,13 +27,29 @@ public class EventReadRepositoryImpl implements EventReadRepository {
         this.redisRepository = redisRepository;
     }
 
+    /**
+     * Récupère un événement depuis le cache Redis.
+     *
+     * @param id L'identifiant UUID de l'événement.
+     * @return Le DTO mappé si trouvé, sinon {@code null}.
+     */
     @Override
     public EventListResponse findById(UUID id) {
         return redisRepository.findById(id)
                 .map(this::toEventResponse)
                 .orElse(null);
     }
-
+    /**
+     * Récupération par lot (Batch Retrieval).
+     * <p>
+     * Utilise la capacité de Redis (généralement la commande MGET) pour récupérer
+     * plusieurs clés en un seul aller-retour réseau, ce qui est bien plus performant
+     * qu'une boucle d'appels unitaires.
+     * </p>
+     *
+     * @param ids Liste des UUIDs à récupérer.
+     * @return Liste des DTOs trouvés.
+     */
     @Override
     public List<EventListResponse> findAllByIds(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -38,7 +62,17 @@ public class EventReadRepositoryImpl implements EventReadRepository {
         return result;
     }
 
-
+    /**
+     * Mapper interne : Redis Entity -> API DTO.
+     * <p>
+     * Cette méthode effectue la "réhydratation" des données.
+     * Elle prend l'objet plat de Redis (où {@code venueName}, {@code latitude}, etc. sont au même niveau)
+     * et reconstruit la hiérarchie d'objets attendue par l'API (objet {@code VenueView}, objet {@code Coordinates}).
+     * </p>
+     *
+     * @param m Le modèle de stockage Redis (plat).
+     * @return La réponse API (structurée).
+     */
     private EventListResponse toEventResponse(EventRedis m) {
         return new EventListResponse(
                 m.getId(),

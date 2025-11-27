@@ -7,6 +7,7 @@ import com.example.eventbackend.catalog.domain.repository.EventRepository;
 import com.example.eventbackend.catalog.infrastructure.redis.EventRedis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -15,7 +16,23 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
+/**
+ * Listener RabbitMQ responsable de la synchronisation des données (Data Sync Worker).
+ * <p>
+ * Ce composant écoute les messages provenant du CMS (Strapi) via RabbitMQ et orchestre
+ * la mise à jour de tous les modèles de lecture (Read Models) et d'écriture.
+ * </p>
+ * <p>
+ * Flux de données (Pattern Fan-out) :
+ *  Réception du message JSON (ex: "Event Created").
+ *  Désérialisation en objet métier {@link Event}.
+ *  Sauvegarde dans la base de référence <strong>SQL</strong> (Source of Truth).
+ *  Mise à jour du cache <strong>Redis</strong> pour les lectures rapides.
+ *  Indexation dans <strong>MeiliSearch</strong> pour le moteur de recherche.
+ * </p>
+ */
 @Component
+@Slf4j
 public class StrapiEventListener {
 
     private final EventRepository eventRepository;
@@ -33,6 +50,17 @@ public class StrapiEventListener {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Traite les messages entrants sur la queue `catalog_events_queue`.
+     * <p>
+     * Configuration RabbitMQ :
+     * Exchange : "events" (Type: Topic)
+     * Routing Key : "event.*" (Attrape event.created, event.updated, etc.)
+     * Queue :</strong> "catalog_events_queue" (Durable)
+     * </p>
+     *
+     * @param message Le corps du message (Payload) au format JSON string.
+     */
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue(value = "catalog_events_queue", durable = "true"),
             exchange = @Exchange(value = "events", type = "topic"),
@@ -40,8 +68,7 @@ public class StrapiEventListener {
     ))
     public void handleEventMessage(String message) {
         try {
-            System.out.println("==================================================");
-            System.out.println("📩 1. Message reçu : " + message);
+            log.info("Message reçu depuis RabbitMQ : {}", message);
 
             Event event = objectMapper.readValue(message, Event.class);
 
@@ -51,28 +78,36 @@ public class StrapiEventListener {
             }
 
             eventRepository.save(event);
-            System.out.println("✅ 2. Sauvegarde SQL réussie");
+            log.debug("Sauvegarde SQL réussie pour l'ID : {}", event.getId());
 
             try {
                 EventRedis redisModel = mapToRedis(event);
                 redisRepository.save(redisModel);
-                System.out.println("✅ 3. Sauvegarde Redis réussie");
+                log.debug("Sauvegarde Redis réussie");
             } catch (Exception e) {
-                System.err.println("⚠️ Erreur Redis : " + e.getMessage());
+                log.warn("Échec de la sauvegarde Redis (non-bloquant) : {}", e.getMessage());
             }
 
-            // 3. INDEXATION MEILISEARCH
+
             String meiliJson = objectMapper.writeValueAsString(event);
             meilisearchClient.index("events").addDocuments(meiliJson);
-            System.out.println("✅ 4. Indexation Meilisearch réussie");
-            System.out.println("==================================================");
+            log.info("Synchronisation terminée avec succès (SQL + Redis + Meili) pour l'événement : {}", event.getTitle());
 
         } catch (Exception e) {
-            System.err.println("🛑 ERREUR :" + e.getMessage());
-            e.fillInStackTrace();
+            log.error("ERREUR CRITIQUE lors du traitement du message RabbitMQ", e);
         }
     }
 
+    /**
+     * Convertit l'objet du domaine en objet optimisé pour Redis.
+     * <p>
+     * Gère la null-safety pour éviter les NullPointerException si le lieu (Venue)
+     * n'est pas encore défini dans le message entrant.
+     * </p>
+     *
+     * @param event L'événement source.
+     * @return L'entité Redis prête à être sauvegardée.
+     */
     private EventRedis mapToRedis(Event event) {
         return EventRedis.builder()
                 .id(event.getId())
