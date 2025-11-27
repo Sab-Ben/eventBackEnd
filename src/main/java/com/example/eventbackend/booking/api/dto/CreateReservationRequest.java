@@ -1,4 +1,4 @@
-package com.example.eventbackend.booking.api;
+package com.example.eventbackend.booking.api.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

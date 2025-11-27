@@ -1,4 +1,4 @@
-package com.example.eventbackend.social.api;
+package com.example.eventbackend.social.api.controller;
 
 import com.example.eventbackend.catalog.api.dto.EventListResponse;
 import com.example.eventbackend.shared.security.CurrentUser;

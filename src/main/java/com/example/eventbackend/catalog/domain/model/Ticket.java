@@ -12,9 +12,9 @@ public class Ticket {
     private String id;
     private String name;
 
-    @JsonProperty("price") // Mapping JSON
+    @JsonProperty("price")
     private Integer price;
 
-    @JsonProperty("quantity") // Mapping JSON
+    @JsonProperty("quantity")
     private Integer quantity;
 }

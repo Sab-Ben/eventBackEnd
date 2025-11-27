@@ -1,6 +1,6 @@
 package com.example.eventbackend.booking.infrastructure.projection;
 
-import com.example.eventbackend.booking.application.query.ReservationResponse;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,15 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Repository pour les projections de réservation dans Redis.
- * 
- * Structure Redis :
- * - reservation:{id} -> JSON de ReservationResponse (TTL selon statut)
- * - user:{userId}:reservations -> Set des IDs de réservations confirmées
- * 
- * Pourquoi Redis ?
- * - Lectures ultra-rapides (< 1ms)
- * - Pas de charge sur PostgreSQL pour les queries
- * - Données dénormalisées, prêtes à l'emploi pour l'API
  */
 @Repository
 public class ReservationProjectionRepository {

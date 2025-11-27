@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JpaEventRepository extends JpaRepository<EventEntity, String> {
-    // Spring implémente automatiquement save(), findById(), etc.
+
 }

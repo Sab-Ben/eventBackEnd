@@ -28,8 +28,6 @@ public class Event {
     @JsonProperty("tickets")
     private List<Ticket> tickets = new ArrayList<>();
 
-    // ✨ LA MAGIE OPÈRE ICI ✨
-    // Jackson va générer un champ JSON "_geo" à partir de ce getter
     @JsonProperty("_geo")
     public Map<String, Double> getGeo() {
         if (venue == null || venue.getLatitude() == null || venue.getLongitude() == null) {

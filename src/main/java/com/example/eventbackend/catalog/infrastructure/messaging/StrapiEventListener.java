@@ -74,20 +74,17 @@ public class StrapiEventListener {
     }
 
     private EventRedis mapToRedis(Event event) {
-        // Utilisation du Builder Lombok
         return EventRedis.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .cover(event.getCover())
                 .startAt(event.getStartAt())
-                // Mapping manuel du Venue (Aplatissement)
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : "")
                 .venueAddress(event.getVenue() != null ? event.getVenue().getAddress() : "")
                 .latitude(event.getVenue() != null && event.getVenue().getLatitude() != null ? event.getVenue().getLatitude() : 0.0)
                 .longitude(event.getVenue() != null && event.getVenue().getLongitude() != null ? event.getVenue().getLongitude() : 0.0)
-                // Valeurs par défaut
-                .lowestPriceCents(0) // À calculer via les tickets si besoin
+                .lowestPriceCents(0)
                 .soldOut(false)
                 .likedCount(0)
                 .build();

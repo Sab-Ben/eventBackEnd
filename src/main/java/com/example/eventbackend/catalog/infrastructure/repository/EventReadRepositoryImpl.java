@@ -38,11 +38,10 @@ public class EventReadRepositoryImpl implements EventReadRepository {
         return result;
     }
 
-    // ====== mapping EventRedisModel -> EventResponse ======
 
     private EventListResponse toEventResponse(EventRedis m) {
         return new EventListResponse(
-                m.getId().toString(),
+                m.getId(),
                 m.getTitle(),
                 m.getCover(),
                 (int) m.getLikedCount(),

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 /**
  * Handler pour la commande CreateReservation.
- * 
  * Responsabilités :
  * 1. Valider les données d'entrée
  * 2. Créer l'Aggregate Reservation
@@ -37,10 +36,8 @@ public class CreateReservationHandler implements Command.Handler<CreateReservati
     @Override
     @Transactional
     public CreateReservationResult handle(CreateReservationCommand command) {
-        // 1. Validation des entrées
         validateCommand(command);
-        
-        // 2. Conversion des TicketSelection en ReservationItem (Value Objects)
+
         List<ReservationItem> items = command.getTickets().stream()
             .map(ts -> new ReservationItem(
                 UUID.randomUUID().toString(),
@@ -50,21 +47,17 @@ public class CreateReservationHandler implements Command.Handler<CreateReservati
                 ts.getQuantity()
             ))
             .collect(Collectors.toList());
-        
-        // 3. Création de l'Aggregate via factory method
+
         Reservation reservation = Reservation.create(
             command.getUserId(),
             command.getEventId(),
             items
         );
-        
-        // 4. Persistance
+
         reservationRepository.save(reservation);
-        
-        // 5. Publication de l'événement (asynchrone via RabbitMQ)
+
         publishReservationCreatedEvent(reservation);
-        
-        // 6. Retour du résultat
+
         return new CreateReservationResult(
             reservation.getId(),
             reservation.getExpiresAt(),
@@ -82,8 +75,7 @@ public class CreateReservationHandler implements Command.Handler<CreateReservati
         if (command.getTickets() == null || command.getTickets().isEmpty()) {
             throw new IllegalArgumentException("Au moins un ticket doit être sélectionné");
         }
-        
-        // Vérifier que les quantités sont valides
+
         for (var ticket : command.getTickets()) {
             if (ticket.getQuantity() <= 0) {
                 throw new IllegalArgumentException("La quantité doit être supérieure à 0");

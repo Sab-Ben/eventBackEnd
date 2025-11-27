@@ -26,7 +26,7 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
     @Override
     public List<EventListResponse> handle(SearchEventsQuery query) {
         SearchRequest request = new SearchRequest(query.searchTerm != null ? query.searchTerm : "");
-        request.setLimit(20); // Limite imposée par le backlog [cite: 251, 260]
+        request.setLimit(20);
 
         if (query.isDiscoveryMode) {
             if (query.latitude != null && query.longitude != null) {
@@ -37,7 +37,6 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
             }
         } else {
             if (query.latitude != null && query.longitude != null && query.radius != null) {
-                // Syntaxe Meilisearch pour le rayon : _geoRadius(lat, lng, distance_en_m)
                 String filter = String.format("_geoRadius(%s, %s, %s)",
                         query.latitude,
                         query.longitude,

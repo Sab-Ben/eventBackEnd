@@ -10,7 +10,7 @@ import lombok.Getter;
 public class ConfirmReservationCommand implements Command<Void> {
     
     private final String reservationId;
-    private final String userId;  // Pour vérifier que c'est bien le propriétaire
+    private final String userId;
     
     public ConfirmReservationCommand(String reservationId, String userId) {
         this.reservationId = reservationId;

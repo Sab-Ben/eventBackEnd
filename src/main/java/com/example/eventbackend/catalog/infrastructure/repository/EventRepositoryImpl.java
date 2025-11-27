@@ -20,7 +20,6 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public void save(Event domainEvent) {
-        // 1. MAPPING : Domaine -> Entité JPA
         EventEntity entity = new EventEntity();
         entity.setId(domainEvent.getId());
         entity.setTitle(domainEvent.getTitle());
@@ -49,7 +48,6 @@ public class EventRepositoryImpl implements EventRepository {
             }).collect(Collectors.toList()));
         }
 
-        // 2. SAUVEGARDE JPA
         jpaEventRepository.save(entity);
     }
 

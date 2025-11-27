@@ -28,12 +28,10 @@ public class MeiliConfig {
         return args -> {
             Index index = client.index("events");
 
-            // Rendre les champs filtrables (pour le rayon et la geo)
             index.updateFilterableAttributesSettings(new String[]{
-                    "_geo", "lowestPrice", "startAt", "id" // Ajout de "id" ici !
+                    "_geo", "lowestPrice", "startAt", "id"
             });
 
-            // Rendre les champs triables (pour le tri par distance et likes)
             index.updateSortableAttributesSettings(new String[]{
                     "_geo", "likedCount", "startAt"
             });

@@ -23,7 +23,6 @@ public class GetEventHandlers {
         this.objectMapper = objectMapper;
     }
 
-    // Handler pour récupérer UN événement (GET /events/:id)
     @Component
     public class GetOneHandler implements Command.Handler<GetEventQuery, EventListResponse> {
         @Override
@@ -42,7 +41,6 @@ public class GetEventHandlers {
         @Override
         public List<EventListResponse> handle(GetEventsQuery query) {
             try {
-                // Si la liste est vide, retour vide
                 if (query.ids == null || query.ids.isEmpty()) {
                     return List.of();
                 }
