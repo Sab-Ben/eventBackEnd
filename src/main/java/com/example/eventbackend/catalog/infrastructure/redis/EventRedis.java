@@ -1,11 +1,10 @@
 package com.example.eventbackend.catalog.infrastructure.redis;
 
 import lombok.*;
-import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @RedisHash("events") // clé logique pour Redis
 @Getter
@@ -13,10 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EventRedisModel {
+public class EventRedis {
 
     @Id
-    private UUID id;
+    private String id;
 
     private String title;
     private String description;

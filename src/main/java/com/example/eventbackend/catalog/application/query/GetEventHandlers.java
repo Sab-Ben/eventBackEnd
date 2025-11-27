@@ -1,6 +1,7 @@
 package com.example.eventbackend.catalog.application.query;
 
 import an.awesome.pipelinr.Command;
+import com.example.eventbackend.catalog.api.dto.EventListResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.SearchRequest;

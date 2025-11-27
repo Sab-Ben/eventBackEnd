@@ -1,4 +1,4 @@
-package com.example.eventbackend.catalog.infrastructure.redis;
+package com.example.eventbackend.shared;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;

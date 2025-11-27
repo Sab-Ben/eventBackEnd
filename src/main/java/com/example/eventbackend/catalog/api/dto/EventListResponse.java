@@ -1,4 +1,4 @@
-package com.example.eventbackend.catalog.application.query;
+package com.example.eventbackend.catalog.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;

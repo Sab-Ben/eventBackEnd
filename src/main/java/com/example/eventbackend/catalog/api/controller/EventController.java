@@ -1,7 +1,7 @@
-package com.example.eventbackend.catalog.api;
+package com.example.eventbackend.catalog.api.controller;
 
 import an.awesome.pipelinr.Pipeline;
-import com.example.eventbackend.catalog.application.query.EventListResponse;
+import com.example.eventbackend.catalog.api.dto.EventListResponse;
 import com.example.eventbackend.catalog.application.query.GetEventQuery;
 import com.example.eventbackend.catalog.application.query.GetEventsQuery;
 import com.example.eventbackend.catalog.application.query.SearchEventsQuery;

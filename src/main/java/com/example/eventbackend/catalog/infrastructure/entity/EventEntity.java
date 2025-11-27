@@ -24,12 +24,10 @@ public class EventEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    // Mapping JSON "cover" <-> SQL "cover_url"
     @JsonProperty("cover")
     @Column(name = "cover_url")
     private String cover;
 
-    // L'objet Venue est "aplati" dans la table events
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "name", column = @Column(name = "venue_name")),
@@ -39,21 +37,16 @@ public class EventEntity {
     })
     private VenueEntity venue;
 
-    // Relation vers les Tickets
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @ToString.Exclude
     private List<TicketEntity> tickets = new ArrayList<>();
 
-    // ⚠️ IMPORTANT : Ce champ n'est pas dans ton type TypeScript (Payload Strapi)
-    // MAIS il est requis par ton API (/events/discover) et ta BDD.
-    // Il faudra penser à le peupler (soit Strapi l'envoie quand même, soit tu le calcules).
     @Column(name = "start_at")
     private Instant startAt;
 
     public EventEntity() {}
 
-    // Méthode utilitaire pour ajouter un ticket
     public void addTicket(TicketEntity ticket) {
         tickets.add(ticket);
         ticket.setEvent(this);
