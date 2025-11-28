@@ -9,19 +9,16 @@ public record EventListResponse(
         String cover,
         Integer likedCount,
         VenueView venue,
-        boolean isSoldOut,
+        @JsonProperty("isSoldOut") boolean isSoldOut,
         Instant startAt,
         Integer lowestPrice,
         String description
 ) {
     public record VenueView(
             String name,
-
-            @JsonProperty("adresse")
-            String address,
-
+            String adresse, // Correspond au JSON du frontend
             Coordinates coordinates
     ) {}
 
-    public record Coordinates(double latitude, double longitude) {}
+    public record Coordinates(Double latitude, Double longitude) {}
 }

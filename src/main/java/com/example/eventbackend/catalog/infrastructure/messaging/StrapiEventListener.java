@@ -36,19 +36,31 @@ public class StrapiEventListener {
             System.out.println("==================================================");
             System.out.println("📩 1. Message reçu : " + message);
 
-            // 2. CORRECTION : On désérialise vers le DOMAINE (là où sont les @JsonProperty)
             Event event = objectMapper.readValue(message, Event.class);
 
-            // --- PROTECTION DES DONNÉES ---
-
+            // --- PROTECTION ET CALCULS ---
             if (event.getStartAt() == null) {
-                System.out.println("⚠️ startAt est null -> Ajout de Instant.now()");
                 event.setStartAt(Instant.now());
             }
 
+            // Calcul du prix minimum
+            if (event.getTickets() != null && !event.getTickets().isEmpty()) {
+                int minPrice = event.getTickets().stream()
+                        .mapToInt(t -> t.getPrice() != null ? t.getPrice() : 0)
+                        .min()
+                        .orElse(0);
+                event.setLowestPrice(minPrice);
+            } else {
+                event.setLowestPrice(0);
+            }
+
+            // Initialisation des likes
+            if (event.getLikedCount() == null) {
+                event.setLikedCount(0);
+            }
+
             if (event.getVenue() == null) {
-                System.out.println("⚠️ Venue est null -> Ajout d'un Venue par défaut");
-                Venue defaultVenue = new Venue(); // Venue du Domaine (POJO)
+                Venue defaultVenue = new Venue();
                 defaultVenue.setName("Lieu inconnu");
                 defaultVenue.setAddress("Adresse inconnue");
                 defaultVenue.setLatitude(0.0);
@@ -56,21 +68,21 @@ public class StrapiEventListener {
                 event.setVenue(defaultVenue);
             }
 
-            // --- SAUVEGARDE ---
-
-            // 3. Le Repository va recevoir l'objet Domaine et le convertir en Entity lui-même
+            // --- SAUVEGARDE SQL ---
             eventRepository.save(event);
             System.out.println("✅ 2. Sauvegarde SQL réussie !");
 
-            String meiliJson = objectMapper.writeValueAsString(event);
+            // --- INDEXATION MEILISEARCH avec le bon format pour le frontend ---
+            MeiliEventDocument meiliDoc = MeiliEventDocument.fromDomain(event);
+            String meiliJson = objectMapper.writeValueAsString(meiliDoc);
             meilisearchClient.index("events").addDocuments(meiliJson);
             System.out.println("✅ 3. Indexation Meilisearch réussie !");
+            System.out.println("   Document indexé : " + meiliJson);
             System.out.println("==================================================");
 
         } catch (Exception e) {
-            System.err.println("🛑 ERREUR CAPTURÉE :");
-            System.err.println("👉 Cause : " + e.getMessage());
-            e.fillInStackTrace();
+            System.err.println("🛑 ERREUR CAPTURÉE : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

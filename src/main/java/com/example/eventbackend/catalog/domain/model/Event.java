@@ -28,6 +28,12 @@ public class Event {
     @JsonProperty("tickets")
     private List<Ticket> tickets = new ArrayList<>();
 
+    // --- AJOUTS INDISPENSABLES POUR LE FRONT ---
+    private Integer lowestPrice = 0; // Initialisé à 0
+    private Integer likedCount = 0;  // Initialisé à 0 pour le tri
+    private boolean isSoldOut = false;
+    // -------------------------------------------
+
     // ✨ LA MAGIE OPÈRE ICI ✨
     // Jackson va générer un champ JSON "_geo" à partir de ce getter
     @JsonProperty("_geo")
