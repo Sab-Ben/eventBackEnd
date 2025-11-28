@@ -8,7 +8,6 @@ import java.util.Optional;
 
 /**
  * Repository pour l'Aggregate Reservation.
- * 
  * Interface du domaine - l'implémentation est dans l'infrastructure.
  * Expose des méthodes métier significatives (pas un DAO générique).
  */

@@ -26,22 +26,16 @@ public class ConfirmReservationHandler implements Command.Handler<ConfirmReserva
     @Override
     @Transactional
     public Void handle(ConfirmReservationCommand command) {
-        // 1. Récupérer la réservation
         Reservation reservation = reservationRepository.findById(command.getReservationId())
             .orElseThrow(() -> new IllegalArgumentException("Réservation non trouvée"));
-        
-        // 2. Vérifier que l'utilisateur est le propriétaire
+
         if (!reservation.getUserId().equals(command.getUserId())) {
             throw new IllegalArgumentException("Vous n'êtes pas autorisé à confirmer cette réservation");
         }
-        
-        // 3. Confirmer (la logique métier est dans l'Aggregate)
         reservation.confirm();
-        
-        // 4. Persister
+
         reservationRepository.save(reservation);
-        
-        // 5. Publier l'événement
+
         ReservationConfirmedEvent event = new ReservationConfirmedEvent(
             reservation.getId(),
             reservation.getUserId(),

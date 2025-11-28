@@ -1,4 +1,4 @@
-package com.example.eventbackend.booking.application.query;
+package com.example.eventbackend.booking.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -10,6 +10,14 @@ import java.util.HashMap; // <--- Import Map et HashMap
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Modèle de domaine représentant un Événement, optimisé pour l'indexation.
+ * <p>
+ * Cette classe définit la structure du document JSON qui sera envoyé et stocké
+ * dans le moteur de recherche (MeiliSearch). Les annotations Jackson ({@link JsonProperty})
+ * contrôlent le nom des champs dans l'index.
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 public class Event {
@@ -28,14 +36,23 @@ public class Event {
     @JsonProperty("tickets")
     private List<Ticket> tickets = new ArrayList<>();
 
-    // --- AJOUTS INDISPENSABLES POUR LE FRONT ---
-    private Integer lowestPrice = 0; // Initialisé à 0
-    private Integer likedCount = 0;  // Initialisé à 0 pour le tri
+    private Integer lowestPrice = 0;
+    private Integer likedCount = 0;
     private boolean isSoldOut = false;
-    // -------------------------------------------
-
-    // ✨ LA MAGIE OPÈRE ICI ✨
-    // Jackson va générer un champ JSON "_geo" à partir de ce getter
+    /**
+     * Propriété calculée pour la géolocalisation MeiliSearch.
+     * <p>
+     * MeiliSearch exige un champ spécifique nommé {@code _geo} contenant
+     * les clés {@code lat} et {@code lng} pour activer les fonctionnalités
+     * de tri géographique (`_geoPoint`) et de filtrage (`_geoRadius`).
+     * </p>
+     * <p>
+     * Cette méthode transforme les données de l'objet {@code Venue} en
+     * format compatible lors de la sérialisation JSON.
+     * </p>
+     *
+     * @return Une Map contenant "lat" et "lng", ou {@code null} si les coordonnées sont absentes.
+     */
     @JsonProperty("_geo")
     public Map<String, Double> getGeo() {
         if (venue == null || venue.getLatitude() == null || venue.getLongitude() == null) {

@@ -1,6 +1,6 @@
 package com.example.eventbackend;
 
-import com.example.eventbackend.catalog.infrastructure.redis.EventReadRepository;
+import com.example.eventbackend.catalog.domain.repository.EventReadRepository;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

@@ -11,12 +11,10 @@ import java.util.UUID;
 
 /**
  * Aggregate Root pour la réservation.
- * 
  * Responsabilités :
  * - Garantir les invariants métier
  * - Coordonner les changements internes
  * - Point d'entrée unique pour les modifications
- * 
  * Invariants :
  * - Une réservation ne peut contenir que des tickets du même événement
  * - Une réservation PENDING expire après 10 minutes
@@ -36,17 +34,16 @@ public class Reservation {
     private ReservationStatus status;
     private Instant confirmedAt;
     private Instant updatedAt;
-    
-    // Liste encapsulée - accès en lecture seule depuis l'extérieur
+
+
     private final List<ReservationItem> items;
-    
-    // ========== CONSTRUCTEURS ==========
-    
+
+
     /**
      * Constructeur privé - utiliser les factory methods.
      */
-    private Reservation(String id, String userId, String eventId, 
-                        ReservationStatus status, Instant createdAt, 
+    private Reservation(String id, String userId, String eventId,
+                        ReservationStatus status, Instant createdAt,
                         Instant expiresAt, Instant confirmedAt,
                         List<ReservationItem> items) {
         this.id = id;
@@ -100,8 +97,7 @@ public class Reservation {
         return new Reservation(id, userId, eventId, status, createdAt, 
                                expiresAt, confirmedAt, items);
     }
-    
-    // ========== COMPORTEMENTS MÉTIER (Commands) ==========
+
     
     /**
      * Confirme la réservation après paiement réussi.
@@ -116,7 +112,6 @@ public class Reservation {
         }
         
         if (isExpired()) {
-            // Auto-expire si le délai est dépassé
             this.status = ReservationStatus.EXPIRED;
             this.updatedAt = Instant.now();
             throw new IllegalStateException("La réservation a expiré");
@@ -159,8 +154,7 @@ public class Reservation {
         this.status = ReservationStatus.CANCELLED;
         this.updatedAt = Instant.now();
     }
-    
-    // ========== QUERIES (ne modifient pas l'état) ==========
+
     
     /**
      * Retourne une copie non modifiable des items.

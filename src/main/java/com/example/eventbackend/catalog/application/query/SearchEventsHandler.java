@@ -1,6 +1,7 @@
 package com.example.eventbackend.catalog.application.query;
 
 import an.awesome.pipelinr.Command;
+import com.example.eventbackend.catalog.api.dto.EventListResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.SearchRequest;
@@ -11,6 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Gestionnaire (Handler) responsable de l'exécution des recherches d'événements.
+ * <p>
+ * Ce composant traduit les critères de recherche métier ({@link SearchEventsQuery})
+ * en requêtes techniques compréhensibles par le moteur <strong>MeiliSearch</strong>.
+ * Il gère deux modes de fonctionnement distincts :
+ * <ul>
+ * <li><strong>Mode Découverte :</strong> Priorise la proximité géographique combinée à la popularité.</li>
+ * <li><strong>Mode Recherche :</strong> Filtre strictement les événements dans un rayon donné.</li>
+ * </ul>
+ * </p>
+ */
 @Component
 public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, List<EventListResponse>> {
 
@@ -22,10 +35,17 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Exécute la logique de recherche.
+     *
+     * @param query L'objet contenant les critères de recherche (position, texte, rayon, mode).
+     * @return La liste des événements correspondants (limitée à 20 résultats par défaut).
+     * @throws RuntimeException Si la communication avec MeiliSearch échoue.
+     */
     @Override
     public List<EventListResponse> handle(SearchEventsQuery query) {
         SearchRequest request = new SearchRequest(query.searchTerm != null ? query.searchTerm : "");
-        request.setLimit(20); // Limite imposée par le backlog [cite: 251, 260]
+        request.setLimit(20);
 
         if (query.isDiscoveryMode) {
             if (query.latitude != null && query.longitude != null) {
@@ -36,7 +56,6 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
             }
         } else {
             if (query.latitude != null && query.longitude != null && query.radius != null) {
-                // Syntaxe Meilisearch pour le rayon : _geoRadius(lat, lng, distance_en_m)
                 String filter = String.format("_geoRadius(%s, %s, %s)",
                         query.latitude,
                         query.longitude,

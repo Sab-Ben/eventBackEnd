@@ -1,13 +1,12 @@
-package com.example.eventbackend.social.api;
+package com.example.eventbackend.social.api.controller;
 
-import com.example.eventbackend.catalog.api.dto.EventResponse;
+import com.example.eventbackend.catalog.api.dto.EventListResponse;
 import com.example.eventbackend.shared.security.CurrentUser;
 import com.example.eventbackend.social.domain.SocialService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -36,9 +35,9 @@ public class LikesController {
     }
 
     @GetMapping("/liked")
-    public ResponseEntity<List<EventResponse>> getLikedEvents() {
+    public ResponseEntity<List<EventListResponse>> getLikedEvents() {
         String userId = currentUser.requireUserId();
-        List<EventResponse> events = socialService.getLikedEvents(userId);
+        List<EventListResponse> events = socialService.getLikedEvents(userId);
         return ResponseEntity.ok(events);
     }
 }

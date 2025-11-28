@@ -1,6 +1,6 @@
 package com.example.eventbackend.booking.infrastructure.messaging;
 
-import com.example.eventbackend.booking.application.query.ReservationResponse;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import com.example.eventbackend.booking.domain.event.ReservationConfirmedEvent;
 import com.example.eventbackend.booking.domain.event.ReservationCreatedEvent;
 import com.example.eventbackend.booking.domain.event.ReservationExpiredEvent;
@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Listener pour mettre à jour les projections Redis.
- * 
  * Écoute les événements du BC Booking et met à jour les vues de lecture.
  * Pattern CQRS : Séparer les modèles d'écriture (PostgreSQL) et de lecture (Redis).
  */

@@ -1,6 +1,7 @@
 package com.example.eventbackend.booking.application.query;
 
 import an.awesome.pipelinr.Command;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import com.example.eventbackend.booking.infrastructure.projection.ReservationProjectionRepository;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +9,7 @@ import java.util.List;
 
 /**
  * Handlers pour les queries de réservation.
- * 
- * Utilisent Redis (projections) pour des lectures ultra-rapides.
+ * Utilise Redis (projections) pour des lectures ultra-rapides.
  */
 @Component
 public class ReservationQueryHandlers {

@@ -1,6 +1,7 @@
 package com.example.eventbackend.booking.application.query;
 
 import an.awesome.pipelinr.Command;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import lombok.Getter;
 
 import java.util.List;

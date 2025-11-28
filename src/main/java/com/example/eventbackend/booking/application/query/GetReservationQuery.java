@@ -1,11 +1,11 @@
 package com.example.eventbackend.booking.application.query;
 
 import an.awesome.pipelinr.Command;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import lombok.Getter;
 
 /**
  * Query pour récupérer une réservation par son ID.
- * 
  * Une Query représente une demande d'information :
  * - Un seul handler
  * - Retourne toujours un résultat

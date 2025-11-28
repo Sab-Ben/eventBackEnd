@@ -1,12 +1,13 @@
-package com.example.eventbackend.booking.api;
+package com.example.eventbackend.booking.api.controller;
 
 import an.awesome.pipelinr.Pipeline;
+import com.example.eventbackend.booking.api.dto.CreateReservationRequest;
 import com.example.eventbackend.booking.application.command.ConfirmReservationCommand;
 import com.example.eventbackend.booking.application.command.CreateReservationCommand;
 import com.example.eventbackend.booking.application.command.CreateReservationResult;
 import com.example.eventbackend.booking.application.query.GetReservationQuery;
 import com.example.eventbackend.booking.application.query.GetUserReservationsQuery;
-import com.example.eventbackend.booking.application.query.ReservationResponse;
+import com.example.eventbackend.booking.api.dto.ReservationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
 
 /**
  * Controller REST pour les réservations.
- * 
  * Endpoints :
  * - POST /reservations : Créer une réservation
  * - POST /reservations/{id}/confirm : Confirmer une réservation (après paiement)
@@ -49,8 +49,7 @@ public class ReservationController {
             @AuthenticationPrincipal Jwt jwt) {
         
         String userId = jwt.getSubject();
-        
-        // Convertir la requête en Command
+
         List<CreateReservationCommand.TicketSelection> tickets = request.getTickets().stream()
             .map(t -> new CreateReservationCommand.TicketSelection(
                 t.getTicketId(),
