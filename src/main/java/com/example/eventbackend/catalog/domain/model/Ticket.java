@@ -20,7 +20,7 @@ public class Ticket {
     private String name;
 
     @JsonProperty("price")
-    private Integer price;
+    private Double price;  // Changed from Integer to Double for decimal prices (e.g., 12.50€)
 
     @JsonProperty("quantity")
     private Integer quantity;

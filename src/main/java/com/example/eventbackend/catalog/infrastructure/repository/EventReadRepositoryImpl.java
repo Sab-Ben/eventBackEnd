@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Implémentation du repository de lecture utilisant Redis comme source de données.
@@ -30,15 +29,16 @@ public class EventReadRepositoryImpl implements EventReadRepository {
     /**
      * Récupère un événement depuis le cache Redis.
      *
-     * @param id L'identifiant UUID de l'événement.
+     * @param id L'identifiant String de l'événement.
      * @return Le DTO mappé si trouvé, sinon {@code null}.
      */
     @Override
-    public EventListResponse findById(UUID id) {
+    public EventListResponse findById(String id) {
         return redisRepository.findById(id)
                 .map(this::toEventResponse)
                 .orElse(null);
     }
+
     /**
      * Récupération par lot (Batch Retrieval).
      * <p>
@@ -47,11 +47,11 @@ public class EventReadRepositoryImpl implements EventReadRepository {
      * qu'une boucle d'appels unitaires.
      * </p>
      *
-     * @param ids Liste des UUIDs à récupérer.
+     * @param ids Liste des IDs à récupérer.
      * @return Liste des DTOs trouvés.
      */
     @Override
-    public List<EventListResponse> findAllByIds(List<UUID> ids) {
+    public List<EventListResponse> findAllByIds(List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
@@ -66,8 +66,7 @@ public class EventReadRepositoryImpl implements EventReadRepository {
      * Mapper interne : Redis Entity -> API DTO.
      * <p>
      * Cette méthode effectue la "réhydratation" des données.
-     * Elle prend l'objet plat de Redis (où {@code venueName}, {@code latitude}, etc. sont au même niveau)
-     * et reconstruit la hiérarchie d'objets attendue par l'API (objet {@code VenueView}, objet {@code Coordinates}).
+     * Elle prend l'objet plat de Redis et reconstruit la hiérarchie d'objets attendue par l'API.
      * </p>
      *
      * @param m Le modèle de stockage Redis (plat).
@@ -89,7 +88,7 @@ public class EventReadRepositoryImpl implements EventReadRepository {
                 ),
                 m.isSoldOut(),
                 m.getStartAt(),
-                m.getLowestPriceCents(),
+                m.getLowestPrice(),
                 m.getDescription()
         );
     }

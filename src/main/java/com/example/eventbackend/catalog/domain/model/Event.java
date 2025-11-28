@@ -36,7 +36,7 @@ public class Event {
     @JsonProperty("tickets")
     private List<Ticket> tickets = new ArrayList<>();
 
-    private Integer lowestPrice = 0;
+    private Double lowestPrice = 0.0;  // Changed to Double for decimal prices
     private Integer likedCount = 0;
     private boolean isSoldOut = false;
     /**

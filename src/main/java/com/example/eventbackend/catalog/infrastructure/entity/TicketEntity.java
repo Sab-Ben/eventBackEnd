@@ -24,16 +24,14 @@ public class TicketEntity {
     private String name;
 
     /**
-     * Prix du billet en <strong>centimes</strong>.
+     * Prix du billet en <strong>euros</strong> (décimal).
      * <p>
-     * Mappé sur la colonne SQL {@code price_cents}.
-     * L'utilisation d'un entier garantit la précision des calculs financiers
-     * (pas d'erreurs d'arrondi virgule flottante).
+     * Supporte les prix décimaux comme 12.50€.
      * </p>
      */
-    @Column(name = "price_cents")
+    @Column(name = "price")
     @JsonProperty("price")
-    private Integer price;
+    private Double price;
 
     /**
      * Quantité totale de billets mis en vente pour cette catégorie.

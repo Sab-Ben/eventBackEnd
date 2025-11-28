@@ -79,13 +79,13 @@ public class StrapiEventListener {
 
             // Calcul du prix minimum
             if (event.getTickets() != null && !event.getTickets().isEmpty()) {
-                int minPrice = event.getTickets().stream()
-                        .mapToInt(t -> t.getPrice() != null ? t.getPrice() : 0)
+                double minPrice = event.getTickets().stream()
+                        .mapToDouble(t -> t.getPrice() != null ? t.getPrice() : 0.0)
                         .min()
-                        .orElse(0);
+                        .orElse(0.0);
                 event.setLowestPrice(minPrice);
             } else {
-                event.setLowestPrice(0);
+                event.setLowestPrice(0.0);
             }
 
             // Initialisation des likes
@@ -113,8 +113,9 @@ public class StrapiEventListener {
                 log.warn("Échec de la sauvegarde Redis (non-bloquant) : {}", e.getMessage());
             }
 
-
-            String meiliJson = objectMapper.writeValueAsString(event);
+            // Convert to MeiliSearch document format (with nested coordinates structure)
+            MeiliEventDocument meiliDoc = MeiliEventDocument.fromDomain(event);
+            String meiliJson = objectMapper.writeValueAsString(meiliDoc);
             meilisearchClient.index("events").addDocuments(meiliJson);
             log.info("Synchronisation terminée avec succès (SQL + Redis + Meili) pour l'événement : {}", event.getTitle());
 
@@ -144,9 +145,9 @@ public class StrapiEventListener {
                 .venueAddress(event.getVenue() != null ? event.getVenue().getAddress() : "")
                 .latitude(event.getVenue() != null && event.getVenue().getLatitude() != null ? event.getVenue().getLatitude() : 0.0)
                 .longitude(event.getVenue() != null && event.getVenue().getLongitude() != null ? event.getVenue().getLongitude() : 0.0)
-                .lowestPriceCents(0)
-                .soldOut(false)
-                .likedCount(0)
+                .lowestPrice(event.getLowestPrice() != null ? event.getLowestPrice() : 0.0)
+                .soldOut(event.isSoldOut())
+                .likedCount(event.getLikedCount() != null ? event.getLikedCount() : 0)
                 .build();
     }
 }
