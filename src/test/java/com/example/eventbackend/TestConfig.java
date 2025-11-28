@@ -1,6 +1,6 @@
 package com.example.eventbackend;
 
-import com.example.eventbackend.catalog.domain.repository.EventReadRepository;
+import com.example.eventbackend.catalog.infrastructure.redis.EventRedisRepository;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 public class TestConfig {
 
     @Bean
-    public EventReadRepository eventReadRepository() {
+    public EventRedisRepository eventRedisRepository() {
         // Faux repository pour que le contexte démarre sans Redis
-        return Mockito.mock(EventReadRepository.class);
+        return Mockito.mock(EventRedisRepository.class);
     }
 }

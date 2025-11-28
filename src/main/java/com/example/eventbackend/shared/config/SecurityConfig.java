@@ -25,10 +25,6 @@ public class SecurityConfig {
 
     /**
      * Définit la chaîne de filtres de sécurité.
-     *
-     * @param http Le builder de sécurité de Spring.
-     * @return La chaîne configurée.
-     * @throws Exception En cas d'erreur de configuration.
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,9 +33,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/events/**").permitAll()
-                        .requestMatchers("/bookings/**").permitAll()
-                        .anyRequest().permitAll());
+                        // Endpoints publics (lecture)
+                        .requestMatchers("/events/discover", "/events/search").permitAll()
+                        // Endpoints protégés (écriture)
+                        .requestMatchers("/events/*/like").authenticated()
+                        .requestMatchers("/events/liked").authenticated()
+                        .requestMatchers("/bookings/**").authenticated()
+                        // Tout le reste est ouvert
+                        .anyRequest().permitAll())
+                // Validation du token JWT via Keycloak
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
 
         return http.build();
     }
