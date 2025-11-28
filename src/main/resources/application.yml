@@ -5,6 +5,13 @@ spring:
     url: jdbc:postgresql://localhost:5432/eventbyte
     username: root
     password: root
+  sql:
+    init:
+      mode: always
+      schema-locations:
+        - classpath:catalog_schema.sql
+        - classpath:booking_schema.sql
+        - classpath:social_schema.sql
   jpa:
     hibernate:
       ddl-auto: validate

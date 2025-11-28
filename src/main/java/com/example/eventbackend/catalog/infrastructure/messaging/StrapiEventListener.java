@@ -72,9 +72,34 @@ public class StrapiEventListener {
 
             Event event = objectMapper.readValue(message, Event.class);
 
-            if (event.getStartAt() == null) event.setStartAt(Instant.now());
+            // --- PROTECTION ET CALCULS ---
+            if (event.getStartAt() == null) {
+                event.setStartAt(Instant.now());
+            }
+
+            // Calcul du prix minimum
+            if (event.getTickets() != null && !event.getTickets().isEmpty()) {
+                int minPrice = event.getTickets().stream()
+                        .mapToInt(t -> t.getPrice() != null ? t.getPrice() : 0)
+                        .min()
+                        .orElse(0);
+                event.setLowestPrice(minPrice);
+            } else {
+                event.setLowestPrice(0);
+            }
+
+            // Initialisation des likes
+            if (event.getLikedCount() == null) {
+                event.setLikedCount(0);
+            }
+
             if (event.getVenue() == null) {
-                event.setVenue(new Venue("Inconnu", "Inconnu", 0.0, 0.0));
+                Venue defaultVenue = new Venue();
+                defaultVenue.setName("Lieu inconnu");
+                defaultVenue.setAddress("Adresse inconnue");
+                defaultVenue.setLatitude(0.0);
+                defaultVenue.setLongitude(0.0);
+                event.setVenue(defaultVenue);
             }
 
             eventRepository.save(event);

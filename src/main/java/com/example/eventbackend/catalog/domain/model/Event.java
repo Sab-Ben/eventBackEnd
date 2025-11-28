@@ -36,6 +36,9 @@ public class Event {
     @JsonProperty("tickets")
     private List<Ticket> tickets = new ArrayList<>();
 
+    private Integer lowestPrice = 0;
+    private Integer likedCount = 0;
+    private boolean isSoldOut = false;
     /**
      * Propriété calculée pour la géolocalisation MeiliSearch.
      * <p>
