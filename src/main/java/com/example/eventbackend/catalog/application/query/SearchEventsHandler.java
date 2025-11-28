@@ -64,10 +64,11 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
             }
         } else {
             if (query.latitude != null && query.longitude != null && query.radius != null) {
+                // radius is already in meters from frontend
                 String filter = String.format("_geoRadius(%s, %s, %s)",
                         query.latitude,
                         query.longitude,
-                        query.radius * 1000);
+                        query.radius);
                 request.setFilter(new String[]{filter});
             }
         }
