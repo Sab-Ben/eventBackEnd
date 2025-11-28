@@ -30,7 +30,7 @@ public record EventListResponse(
         VenueView venue,
         boolean isSoldOut,
         Instant startAt,
-        Integer lowestPrice,
+        Double lowestPrice,  // Changed to Double for decimal prices (e.g., 12.50€)
         String description
 ) {
     /**

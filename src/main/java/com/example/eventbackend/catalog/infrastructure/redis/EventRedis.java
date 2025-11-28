@@ -41,7 +41,7 @@ public class EventRedis {
     private double longitude;
 
     private Instant startAt;
-    private int lowestPriceCents;
+    private double lowestPrice;  // Prix en euros (ex: 12.50)
     private boolean soldOut;
 
     private long likedCount;

@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS catalog.tickets (
 
     -- Détails du ticket
     name            VARCHAR(255) NOT NULL, -- ex: "Standard", "VIP"
-    price_cents     INTEGER NOT NULL,      -- Stocké en centimes pour éviter les erreurs d'arrondi
+    price           DOUBLE PRECISION NOT NULL,  -- Prix en euros (ex: 12.50)
     quantity_total  INTEGER NOT NULL,      -- Stock initial
 
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),

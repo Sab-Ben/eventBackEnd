@@ -3,7 +3,6 @@ package com.example.eventbackend.catalog.domain.repository;
 import com.example.eventbackend.catalog.api.dto.EventListResponse;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Contrat d'interface pour l'accès aux données de lecture (Read Repository).
@@ -22,10 +21,10 @@ public interface EventReadRepository {
     /**
      * Recherche un événement par son identifiant unique.
      *
-     * @param id L'identifiant UUID de l'événement.
-     * @return La projection de l'événement (DTO) si trouvé, ou {@code null} (ou une exception selon l'implémentation) si inexistant.
+     * @param id L'identifiant String de l'événement.
+     * @return La projection de l'événement (DTO) si trouvé, ou {@code null} si inexistant.
      */
-    EventListResponse findById(UUID id);
+    EventListResponse findById(String id);
 
     /**
      * Récupère une liste d'événements à partir d'une liste d'identifiants.
@@ -34,8 +33,8 @@ public interface EventReadRepository {
      * afin d'éviter le problème N+1 requêtes.
      * </p>
      *
-     * @param ids La liste des UUIDs des événements à récupérer.
+     * @param ids La liste des IDs des événements à récupérer.
      * @return Une liste contenant les projections des événements trouvés.
      */
-    List<EventListResponse> findAllByIds(List<UUID> ids);
+    List<EventListResponse> findAllByIds(List<String> ids);
 }

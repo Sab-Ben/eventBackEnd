@@ -3,8 +3,6 @@ package com.example.eventbackend.catalog.domain.repository;
 import com.example.eventbackend.catalog.infrastructure.redis.EventRedis;
 import org.springframework.data.repository.ListCrudRepository;
 
-import java.util.UUID;
-
 /**
  * Interface de repository Spring Data dédiée à la persistance des événements dans Redis.
  * <p>
@@ -21,6 +19,6 @@ import java.util.UUID;
  *
  * @see EventRedis Le modèle de données stocké.
  */
-public interface EventRedisSpringRepository extends ListCrudRepository<EventRedis, UUID> {
+public interface EventRedisSpringRepository extends ListCrudRepository<EventRedis, String> {
 
 }

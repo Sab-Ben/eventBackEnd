@@ -25,7 +25,7 @@ public class MeiliEventDocument {
     @JsonProperty("isSoldOut")
     private boolean isSoldOut;
     private Instant startAt;
-    private Integer lowestPrice;
+    private Double lowestPrice;  // Changed to Double for decimal prices
     private String description;
 
     // Pour le tri géographique de MeiliSearch
@@ -80,7 +80,7 @@ public class MeiliEventDocument {
                 .venue(venueDoc)
                 .isSoldOut(event.isSoldOut())
                 .startAt(event.getStartAt())
-                .lowestPrice(event.getLowestPrice() != null ? event.getLowestPrice() : 0)
+                .lowestPrice(event.getLowestPrice() != null ? event.getLowestPrice() : 0.0)
                 .description(event.getDescription())
                 .geo(geoDoc)
                 .build();
