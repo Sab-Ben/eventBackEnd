@@ -2,8 +2,8 @@ package com.example.eventbackend.catalog.application.query;
 
 import an.awesome.pipelinr.Command;
 import com.example.eventbackend.catalog.api.dto.EventListResponse;
-import com.example.eventbackend.catalog.domain.repository.EventRedisSpringRepository;
 import com.example.eventbackend.catalog.infrastructure.redis.EventRedis;
+import com.example.eventbackend.catalog.infrastructure.redis.EventRedisRepository;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.model.SearchResult;
@@ -14,48 +14,32 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Gestionnaire (Handler) responsable de l'exécution des recherches d'événements.
- * <p>
- * Architecture CQRS respectée :
- * <ul>
- * <li><strong>MeiliSearch</strong> : Moteur de recherche pour le tri géographique et full-text.
- *     Retourne uniquement les IDs triés.</li>
- * <li><strong>Redis</strong> : Stockage des projections de lecture.
- *     Retourne les données complètes des événements.</li>
- * </ul>
- * </p>
+ * Handler pour les recherches d'événements (US 1 & US 2).
+ * 
+ * Architecture CQRS :
+ * - MeiliSearch : recherche et tri (retourne les IDs)
+ * - Redis : projections de lecture (retourne les données complètes)
  */
 @Component
 @Slf4j
 public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, List<EventListResponse>> {
 
     private final Client meiliClient;
-    private final EventRedisSpringRepository redisRepository;
+    private final EventRedisRepository redisRepository;
 
-    public SearchEventsHandler(Client meiliClient, EventRedisSpringRepository redisRepository) {
+    public SearchEventsHandler(Client meiliClient, EventRedisRepository redisRepository) {
         this.meiliClient = meiliClient;
         this.redisRepository = redisRepository;
     }
 
-    /**
-     * Exécute la logique de recherche.
-     * <p>
-     * Flux :
-     * 1. Interroge MeiliSearch pour obtenir les IDs triés (géo + popularité)
-     * 2. Récupère les projections complètes depuis Redis
-     * 3. Préserve l'ordre de tri de MeiliSearch
-     * </p>
-     *
-     * @param query L'objet contenant les critères de recherche (position, texte, rayon, mode).
-     * @return La liste des événements correspondants (limitée à 20 résultats par défaut).
-     */
     @Override
     public List<EventListResponse> handle(SearchEventsQuery query) {
-        // === ÉTAPE 1 : Recherche dans MeiliSearch (récupère les IDs triés) ===
+        // === ÉTAPE 1 : Recherche dans MeiliSearch ===
         SearchRequest request = new SearchRequest(query.searchTerm != null ? query.searchTerm : "");
         request.setLimit(20);
 
         if (query.isDiscoveryMode) {
+            // US 1 : Tri par distance + popularité
             if (query.latitude != null && query.longitude != null) {
                 request.setSort(new String[]{
                         "_geoPoint(" + query.latitude + ", " + query.longitude + "):asc",
@@ -63,8 +47,8 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
                 });
             }
         } else {
+            // US 2 : Filtre par rayon
             if (query.latitude != null && query.longitude != null && query.radius != null) {
-                // radius is already in meters from frontend
                 String filter = String.format("_geoRadius(%s, %s, %s)",
                         query.latitude,
                         query.longitude,
@@ -75,8 +59,8 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
 
         try {
             SearchResult result = (SearchResult) meiliClient.index("events").search(request);
-            
-            // Extraire les IDs depuis les résultats MeiliSearch
+
+            // Extraire les IDs
             List<String> orderedIds = result.getHits().stream()
                     .map(hit -> (String) ((Map<String, Object>) hit).get("id"))
                     .collect(Collectors.toList());
@@ -85,19 +69,19 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
                 return Collections.emptyList();
             }
 
-            log.debug("MeiliSearch returned {} IDs: {}", orderedIds.size(), orderedIds);
+            log.debug("MeiliSearch returned {} IDs", orderedIds.size());
 
             // === ÉTAPE 2 : Récupérer les projections depuis Redis ===
             Map<String, EventRedis> redisEventsMap = new HashMap<>();
             for (String id : orderedIds) {
-                redisRepository.findById(id).ifPresent(event -> 
-                    redisEventsMap.put(id, event)
+                redisRepository.findById(id).ifPresent(event ->
+                        redisEventsMap.put(id, event)
                 );
             }
 
             log.debug("Redis returned {} events", redisEventsMap.size());
 
-            // === ÉTAPE 3 : Construire la réponse en préservant l'ordre de MeiliSearch ===
+            // === ÉTAPE 3 : Construire la réponse en préservant l'ordre ===
             List<EventListResponse> responses = new ArrayList<>();
             for (String id : orderedIds) {
                 EventRedis redis = redisEventsMap.get(id);
@@ -110,13 +94,10 @@ public class SearchEventsHandler implements Command.Handler<SearchEventsQuery, L
 
         } catch (Exception e) {
             log.error("Erreur lors de la recherche", e);
-            throw new RuntimeException("Erreur lors de la recherche Meilisearch/Redis", e);
+            throw new RuntimeException("Erreur lors de la recherche MeiliSearch/Redis", e);
         }
     }
 
-    /**
-     * Convertit une projection Redis en DTO de réponse API.
-     */
     private EventListResponse mapToResponse(EventRedis redis) {
         return new EventListResponse(
                 redis.getId(),
